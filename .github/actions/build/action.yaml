@@ -1,0 +1,51 @@
+name: Build production Image
+description: build wait-for-it image
+inputs:
+  docker_username:
+    required: true
+    description: 'user'
+    default: ""
+  docker_password:
+    description: 'pass'
+    required: true
+    default: ""
+  tag:
+    required: false
+    default: ""
+    description: 'Tag to deploy'
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Detect Version
+      id: detect_version
+      shell: bash
+      run: |
+        if [ "${{ inputs.tag }}" == "" ]; then
+          COMMIT=${GITHUB_SHA::7}
+          echo "docker_tag=$COMMIT" >> $GITHUB_ENV
+        else 
+          echo "docker_tag=${{ inputs.tag }}" >> $GITHUB_ENV
+        fi
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Build
+      shell: bash
+      run: |
+        CGO_ENABLED=1 GOOS=linux GOARCH=amd64
+        go build -ldflags="-w -s" -o wait-for-it -v .
+
+    - name: Test
+      shell: bash
+      run: go test -v ./...
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: my-artifact
+        path: ./wait-for-it
+
