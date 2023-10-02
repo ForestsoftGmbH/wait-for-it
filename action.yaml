@@ -32,7 +32,14 @@ runs:
     - name: Wait for it
       shell: bash
       run: |
-        wget https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it
+        if [ -x "$(command -v wget)" ]; then
+          echo "wget is installed"
+        else
+          echo "wget is not installed"
+          apt-get update
+          apt-get install -y wget
+        fi
+        wget -q https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it
         chmod +x wait-for-it
         ./wait-for-it -host ${{ inputs.host }} -p ${{ inputs.port }} -timeout ${{ inputs.timeout }} -statusCode ${{ inputs.statusCode }} -path ${{ inputs.path }}
 
