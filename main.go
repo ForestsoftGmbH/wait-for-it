@@ -3,8 +3,10 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/ForestsoftGmbH/wait-for-it/waiter"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -17,7 +19,7 @@ func main() {
 	flag.StringVar(&host, "host", "localhost", "Hostname to check")
 	flag.StringVar(&path, "path", "/", "Path to check")
 	flag.IntVar(&status, "statusCode", 200, "Check for status code")
-	flag.DurationVar(&timeout, "timeout", 30, "Timeout in seconds for the wait")
+	flag.DurationVar(&timeout, "timeout", 2*time.Second, "Timeout in seconds for the wait")
 
 	flag.Parse()
 
@@ -36,31 +38,41 @@ func WaitForIt(host, path string, port, status int, timeout time.Duration) (bool
 	w := waiter.NewWaiter(host, path, port, status)
 
 	ticker := time.NewTicker(time.Second)
-	done := make(chan bool)
+
 	var result bool
 	var err error
 
 	to := time.NewTimer(timeout)
 	defer to.Stop()
 	defer ticker.Stop()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	httpWaiter := waiter.NewHttpWaiter(w)
 	if httpWaiter.ShouldExecute() {
 		go func(waiter waiter.HttpWaiter, timer *time.Timer) {
+			port := fmt.Sprintf("%d", waiter.Waiter.Port)
+			fmt.Println("Waiting for " + waiter.Waiter.Host + ":" + port + waiter.Waiter.Path + " to be ready")
+			defer wg.Done()
 			for {
 				select {
 				case <-timer.C:
 					err = errors.New("Timeout reached")
 					result = false
-				case <-done:
-					result = true
-					err = nil
+					return
 				case <-ticker.C:
 					if waiter.IsReady() {
-						done <- true
+						result = true
+						err = nil
+						fmt.Println("Service is ready")
+						return
 					}
 				}
 			}
+
 		}(httpWaiter, to)
 	}
+	wg.Wait()
 	return result, err
 }
