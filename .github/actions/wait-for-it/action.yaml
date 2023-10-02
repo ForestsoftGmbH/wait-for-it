@@ -1,0 +1,39 @@
+name: Build production Image
+description: build wait-for-it image
+inputs:
+  host:
+    required: true
+    description: 'host to wait for'
+    default: "localhost"
+  port:
+    description: 'port number to listen on'
+    required: true
+    default: "80"
+  path:
+    required: false
+    default: "/"
+    description: 'Path to check'
+  statusCode:
+    required: false
+    default: "200"
+    description: 'Expectected status code'
+  timeout:
+    required: false
+    default: "30"
+    description: 'timeout in seconds to wait'
+  version:
+    required: false
+    default: "v1.0.0"
+    description: 'Version to run'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Wait for it
+      shell: bash
+      run: |
+        wget https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it
+        chmod +x wait-for-it
+        ./wait-for-it -host ${{ inputs.host }} -p ${{ inputs.port }} -timeout ${{ inputs.timeout }} -statusCode ${{ inputs.statusCode }} -path ${{ inputs.path }}
+
+

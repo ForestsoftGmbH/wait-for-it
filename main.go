@@ -19,7 +19,7 @@ func main() {
 	flag.StringVar(&host, "host", "localhost", "Hostname to check")
 	flag.StringVar(&path, "path", "/", "Path to check")
 	flag.IntVar(&status, "statusCode", 200, "Check for status code")
-	flag.DurationVar(&timeout, "timeout", 2*time.Second, "Timeout in seconds for the wait")
+	flag.DurationVar(&timeout, "timeout", 30*time.Second, "Timeout in seconds for the wait")
 
 	flag.Parse()
 
