@@ -34,6 +34,6 @@ runs:
       run: |
         curl -L -s https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it --output wait-for-it
         chmod +x wait-for-it
-        ./wait-for-it -host ${{ inputs.host }} -p ${{ inputs.port }} -timeout ${{ inputs.timeout }} -statusCode ${{ inputs.statusCode }} -path ${{ inputs.path }}
+        ./wait-for-it -host ${{ inputs.host }} -p ${{ inputs.port }} -timeout ${{ inputs.timeout }}s -statusCode ${{ inputs.statusCode }} -path ${{ inputs.path }}
 
 
