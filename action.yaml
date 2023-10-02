@@ -32,7 +32,12 @@ runs:
     - name: Wait for it
       shell: bash
       run: |
-        curl -L -s https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it --output wait-for-it
+        if [[ "${{ inputs.version }}" == "latest" ]]; then
+          URL=https://github.com/ForestsoftGmbH/wait-for-it/releases/latest/download/wait-for-it
+        else 
+          URL=https://github.com/ForestsoftGmbH/wait-for-it/releases/download/${{ inputs.version }}/wait-for-it 
+        fi
+        curl -L -s $URL --output wait-for-it
         chmod +x wait-for-it
         ./wait-for-it -host ${{ inputs.host }} -p ${{ inputs.port }} -timeout ${{ inputs.timeout }}s -statusCode ${{ inputs.statusCode }} -path ${{ inputs.path }}
 
