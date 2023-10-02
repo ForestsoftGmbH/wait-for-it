@@ -19,7 +19,7 @@ inputs:
     description: 'Expectected status code'
   timeout:
     required: false
-    default: "120"
+    default: "180"
     description: 'timeout in seconds to wait'
   version:
     required: false
