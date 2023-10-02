@@ -3,6 +3,7 @@ package waiter
 import (
 	"crypto/tls"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -30,11 +31,11 @@ func (w HttpWaiter) IsReady() bool {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get(getUrl(w.Waiter))
 	if err != nil {
-		fmt.Println(err)
+		log.Debug(fmt.Println(err))
 		return false
 	}
 	if (resp.StatusCode != w.Waiter.Status) && (w.Waiter.Status != 0) {
-		fmt.Println("Status code is " + strconv.Itoa(resp.StatusCode) + " but expected " + strconv.Itoa(w.Waiter.Status))
+		log.Debug("Status code is " + strconv.Itoa(resp.StatusCode) + " but expected " + strconv.Itoa(w.Waiter.Status))
 		return false
 	}
 	return true

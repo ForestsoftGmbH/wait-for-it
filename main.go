@@ -5,10 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ForestsoftGmbH/wait-for-it/waiter"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"sync"
 	"time"
 )
+
+var debugMode bool
 
 func main() {
 	var port, status int
@@ -16,6 +19,7 @@ func main() {
 	var host, path string
 
 	flag.IntVar(&port, "p", 80, "Provide a port number")
+	flag.BoolVar(&debugMode, "debug", false, "Enable debug mode")
 	flag.StringVar(&host, "host", "localhost", "Hostname to check")
 	flag.StringVar(&path, "path", "/", "Path to check")
 	flag.IntVar(&status, "statusCode", 200, "Check for status code")
@@ -23,9 +27,15 @@ func main() {
 
 	flag.Parse()
 
+	if debugMode {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.ErrorLevel)
+	}
+
 	result, err := WaitForIt(host, path, port, status, timeout)
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	if result {
 		os.Exit(0)
@@ -75,4 +85,9 @@ func WaitForIt(host, path string, port, status int, timeout time.Duration) (bool
 	}
 	wg.Wait()
 	return result, err
+}
+func debug(message string) {
+	if debugMode {
+		fmt.Println(message)
+	}
 }
