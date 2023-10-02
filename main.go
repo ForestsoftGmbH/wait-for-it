@@ -58,7 +58,7 @@ func WaitForIt(host, path string, port, status int, timeout time.Duration) (bool
 			for {
 				select {
 				case <-timer.C:
-					err = errors.New(fmt.Sprintf("Timeout %ds reached", timeout.Seconds()))
+					err = errors.New(fmt.Sprintf("Timeout %s reached", timeout))
 					result = false
 					return
 				case <-ticker.C:
