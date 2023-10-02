@@ -3,7 +3,6 @@ package waiter
 import (
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -31,7 +30,7 @@ func (w HttpWaiter) IsReady() bool {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get(getUrl(w.Waiter))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return false
 	}
 	if (resp.StatusCode != w.Waiter.Status) && (w.Waiter.Status != 0) {
